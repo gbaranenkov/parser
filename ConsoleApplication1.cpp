@@ -126,17 +126,10 @@ int main(int argc, char* argv[])
         
     file_in.close();
     
-    for (size_t i = 0; i < buffer.length(); ++i) //проверка входных данных (после = должна идти { или " )
-    {
-        if (buffer[i] == '=' && (buffer[i + 2] != '{' && buffer[i + 2] != '\"'))
-        {
-            std::cout << "Неверный формат данных!\n";
-            return 1;
-        }
-    }
+    bool flag_quote = false;    //флаг для получения значения в кавычках
+
 
     std::vector <std::string> vec; //вектор для записи обработанных значений
-    bool flag_quote = false;    //флаг для получения значения в кавычках
     std::string temp = "";      //временная переменная для передачи значений в вектор
 
     
@@ -188,11 +181,11 @@ int main(int argc, char* argv[])
             
             if (buffer[i] == '=')
             {
-                vec.push_back(temp);
+                vec.push_back(temp); //записываем имя узла
+                vec.push_back("="); //после узла всегда символ = 
                 temp = "";
             }
-        }
-             
+        }             
     }
     
     //проверка ошибок формата данных
@@ -218,9 +211,25 @@ int main(int argc, char* argv[])
             return 1;
         }
 
-        else if (vec[i][0] == '{' || vec[i][0] == '}') 
+        else if (vec[i][0] == '{' || vec[i][0] == '}')// || vec [i] == "=") 
         {
             continue;
+        }
+
+        else if (vec[vec.size()-1] != "}") //последний символ }
+        {
+            std::cout << "Неверный формат данных!\n";
+            return 1;
+        }
+
+        else if (vec[i] == "=")
+        {
+            if (vec[i + 1][0] != '\"' && vec[i + 1][0] != '{') //после = всегда { или "
+            {
+                std::cout << "Неверный формат данных!\n";
+                return 1;
+            }
+            else continue;
         }
 
         else if (vec[i][0] == '\"') //проверка значения узла
@@ -260,7 +269,10 @@ int main(int argc, char* argv[])
             new_node->id = count;
             count++;
         }
-
+        else if(vec[i] == "=")
+        {
+            continue;
+        }
         else if (vec[i][0] == '}')
         {
             current_node = current_node->parent;                

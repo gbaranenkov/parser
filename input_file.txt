@@ -1,4 +1,4 @@
-shape = { 
+shapee = { 
 type = "tetrahedron" 
 vertices = { 
 point = { x = "1" y = "0" z = "0" } 
